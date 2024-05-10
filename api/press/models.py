@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 from django.contrib.auth.models import AbstractUser, Group, Permission, PermissionsMixin
-from citizen.managers import CustomUserManager
+from press.managers import CustomUserManager
 import uuid
 
 class Press(AbstractUser, PermissionsMixin):
@@ -10,7 +10,7 @@ class Press(AbstractUser, PermissionsMixin):
 	Press Table
 	"""
 	name = models.CharField(max_length=255, blank=False)
-	press_id = models.CharField(max_length=255, primary_key=True, blank=False)
+	press_id = models.CharField(max_length=255, primary_key=True, blank=False, default=str(uuid.uuid4()))
 	phone_number = models.CharField(max_length=255, blank=False, unique=True)
 	created_at = models.DateTimeField(auto_now_add=True, null=True)
 	updated_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -32,3 +32,11 @@ class Press(AbstractUser, PermissionsMixin):
 		Citizen string representation
 		"""
 		return self.email
+	
+class PressPost(models.Model):
+	post_id = models.CharField(max_length=255, primary_key=True, blank=False, default=str(uuid.uuid4()))
+	title = models.CharField(max_length=255, blank=False)
+	content = models.TextField()
+	press_id = models.ForeignKey('Press', on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now_add=True, null=True)
+	updated_at = models.DateTimeField(auto_now_add=True, null=True)

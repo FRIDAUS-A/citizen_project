@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from citizen.managers import CustomUserManager
 import uuid
+from press.models import PressPost
+
+#from press import models
+
 
 class Citizen(AbstractUser):
 	"""
@@ -11,7 +15,7 @@ class Citizen(AbstractUser):
 	#last_name = models.CharField(max_length=128, blank=False)
 	#email = models.EmailField(max_length=128, blank=False, unique=True)
 	#password = models.CharField(max_length=128, blank=False)
-	citizen_id = models.CharField(max_length=255, primary_key=True, blank=False)
+	citizen_id = models.CharField(max_length=255, primary_key=True, blank=False, default=str(uuid.uuid4()))
 	phone_number = models.CharField(max_length=255, blank=False, unique=True)
 	address_id = models.ForeignKey('Address', on_delete=models.CASCADE, null=True)
 	nin_number = models.CharField(max_length=20, blank=True)
@@ -53,3 +57,12 @@ class Address(models.Model):
 		Address string representation
 		"""
 		return Address.citizen.first_name + " " + Address.citizen.last_name
+	
+
+class Comment(models.Model):
+	comment_id = models.CharField(max_length=255, primary_key=True, blank=False, default=str(uuid.uuid4()))
+	comment = models.TextField()
+	post_id = models.ForeignKey(PressPost, on_delete=models.CASCADE)
+	citizen_id = models.ForeignKey('Citizen', on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now_add=True, null=True)
+	updated_at = models.DateTimeField(auto_now_add=True, null=True)

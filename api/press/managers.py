@@ -1,6 +1,6 @@
 from django.contrib.auth.base_user import BaseUserManager
 from datetime import datetime
-import uuid
+#import uuid
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
@@ -13,15 +13,10 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError('The Email must be set')
         email = self.normalize_email(email)
-        
-        
-        extra_fields['created_at'] = datetime.now()
-        extra_fields['updated_at'] = datetime.now()
-        extra_fields['press_id'] = uuid.uuid4()
-        extra_fields.setdefault('groups', False)
-        extra_fields.setdefault('user_permissions', False)
+        #extra_fields['press_id'] = uuid.uuid4()
         press = self.model(email=email, **extra_fields)
         press.set_password(password)
+        #press.groups.set([1])
         press.save()
         return press
     def create_superpress(self, email, password, **extra_fields):

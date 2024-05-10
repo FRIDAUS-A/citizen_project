@@ -20,11 +20,10 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Last name must be added')
         extra_fields['created_at'] = datetime.now()
         extra_fields['updated_at'] = datetime.now()
-        extra_fields['citizen_id'] = uuid.uuid4()
-        extra_fields.setdefault('groups', False)
-        extra_fields.setdefault('user_permissions', False)
+        #extra_fields['citizen_id'] = uuid.uuid4()
         citizen = self.model(email=email, **extra_fields)
         citizen.set_password(password)
+        #citizen.groups.set([1])
         citizen.save()
         return citizen
     def create_supercitizen(self, email, password, **extra_fields):
