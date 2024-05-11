@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from citizen.models import Citizen, Comment
 from citizen.models import PressPost
-from citizen.serializers import CitizenSerializer, CommentSerializer
+from citizen.serializers import CitizenSerializer, CommentSerializer, PressPostSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -109,3 +109,26 @@ class CommentList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ViewPostList(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = (permissions.IsAuthenticated, )
+    def get(self, request):
+        posts = PressPost.objects.all()
+        serializer = PressPostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+
+class ViewPostDetail(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = (permissions.IsAuthenticated, )
+    def get_object(self, pk):
+        try:
+            return PressPost.objects.get(pk=pk)
+        except PressPost.DoesNotExist:
+            raise Http404
+        
+    def get(self, request, pk, format=None):
+        post = self.get_object(pk)
+        serializer = PressPostSerializer(post)
+        return Response(serializer.data)
