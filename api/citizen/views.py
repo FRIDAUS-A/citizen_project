@@ -2,8 +2,9 @@ from django.shortcuts import render
 
 # Create your views here.
 from citizen.models import Citizen, Comment
-from citizen.models import PressPost
-from citizen.serializers import CitizenSerializer, CommentSerializer, PressPostSerializer
+from press.models import PressPost
+from citizen.serializers import CitizenSerializer, CommentSerializer
+from press.serializers import PressPostSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,12 +12,10 @@ from rest_framework import status
 from citizen.serializers import LoginSerializer, RegistrationSerializer
 from django.contrib.auth import login
 from rest_framework import permissions
-from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.middleware.csrf import get_token
-from citizen.models import Citizen
 import uuid
 
     
