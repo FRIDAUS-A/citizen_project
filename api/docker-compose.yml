@@ -1,0 +1,76 @@
+version: '4.8'
+
+services:
+
+  app:
+    build:
+      context: .
+    volumes:
+      - .:/app:z
+    ports:
+      - 8008:8000
+    command: bash -c '/app/wait_for_postgres.sh && uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000'
+    environment:
+      DB_HOST: postgresql
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_NAME: mydatabase
+      DB_PORT: "5432"
+    depends_on:
+      - postgresql
+
+  postgresql:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+
+  alembic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app:z
+      - ./alembic:/alembic
+    command: ["alembic", "-c", "alembic.ini", "upgrade", "head"]
+    environment:
+      DB_HOST: postgresql
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_NAME: mydatabase
+      DB_PORT: 5432
+    depends_on:
+      - postgresql
+
+  pgadmin4:
+    image: dpage/pgadmin4:latest
+    ports:
+      - 5050:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@example.com"
+      PGADMIN_DEFAULT_PASSWORD: "password"
+    volumes:
+      - pgadmin4_data:/var/lib/pgadmin
+    depends_on:
+      - postgresql
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: ["python3.12", "-m", "pytest", "tests"]
+    volumes:
+      - .:/app:z
+    depends_on:
+      - app
+      - alembic
+      - postgresql
+
+volumes:
+  postgres_data:
+  pgadmin4_data:
