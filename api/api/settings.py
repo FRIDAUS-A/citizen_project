@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-# Import dj-database-url at the beginning of the file.
-import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,10 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'citizen.authentication.JWTAuthentication',
-    ],
-      'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -45,9 +40,7 @@ REST_FRAMEWORK = {
 }
 
 INSTALLED_APPS = [
-    'comments',
-    'profiles',
-	'posts',
+	'press',
 	'citizen',
 	'rest_framework',
     'django.contrib.admin',
@@ -56,24 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'drf_yasg',
-    'rest_framework_swagger',
 ]
-
-# swagger setting definition
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"',
-        }
-    },
-    'USE_SESSION_AUTH': False,  # Disable session-based authentication in Swagger UI
-    'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg.inspectors.SwaggerAutoSchema',
-    'JSON_EDITOR': True,
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -109,7 +85,6 @@ WSGI_APPLICATION = 'api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -119,15 +94,6 @@ DATABASES = {
 		'USER': 'root',
 		'PORT': '8000'
     }
-}
-"""
-# Replace the SQLite DATABASES configuration with PostgreSQL:
-DATABASES = {
-    'default': dj_database_url.config(
-        # Replace this value with your local database's connection string.
-        default='postgresql://root:W3kIvD0zCxyfvl7IC0d9855miKSmPFLG@dpg-creqndaj1k6c73dfh820-a.oregon-postgres.render.com/citizen_db',
-        conn_max_age=600
-    )
 }
 
 
@@ -172,9 +138,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-JWT_CONF = {
-    "TOKEN_LIFETIME_HOURS": 24
-}
-APPEND_SLASH=True
+AUTH_USER_MODEL = os.getenv('USER')
 
-AUTH_USER_MODEL = 'citizen.Citizen'
+AUTHENTICATION_BACKENDS = [
+    'citizen.authentication.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]

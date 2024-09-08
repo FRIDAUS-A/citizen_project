@@ -16,36 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-from rest_framework_swagger.views import get_swagger_view
-#from django.conf.urls import url
 #from django.conf.urls import url
 #from allauth.account.views import confirm_email
 
-
-schema_view = get_schema_view(
-    openapi.Info(
-        title="CITIZEN API",
-        default_version='v1',
-        description="THIS API CONTAINS ALL THE ENPOINT IN THE V1 OF THIS APPLICATION, YOU CAN TEST IT OUT",
-        terms_of_service="https://www.example.com/terms/",
-        contact=openapi.Contact(email="fridausokoya@gmail.com"),
-        license=openapi.License(name="License"),
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
-
-#schema_view_rest = get_swagger_view(title='Pastebin API')
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('api/v1/auth/', include('citizen.urls')),
-    path('api/v1/profiles', include('profiles.urls')),
-    path('api/v1/posts', include('posts.urls')),
-    path('api/v1/comments/', include('comments.urls')),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),  
+	path('api/v1/citizen/', include('citizen.urls')),
+	path('api/v1/press/', include('press.urls'))
 ]

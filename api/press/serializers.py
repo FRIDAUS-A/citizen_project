@@ -1,26 +1,21 @@
 from rest_framework import serializers
-from citizen.models import Citizen, Address, Comment
+from press.models import Press, PressPost
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from django.contrib.auth.models import Group
-from press.models import Press
-
-class CitizenSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = Citizen
-		fields = ['first_name', 'last_name', 'email', 'phone_number']
-
-class AddressSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = Address
-		fields = '__all__'
-
-class CommentSerializer(serializers.ModelSerializer):
-     class Meta:
-          model = Comment
-          fields = '__all__'
 
 
+class PressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Press
+        fields = ['name', 'email', 'phone_number', 'press_id']
+
+
+class PressPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PressPost
+        fields = '__all__'
+    
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
@@ -28,7 +23,7 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         email = data.get('email')
         password = data.get('password')
-        
+
         if email and password:
             user = authenticate(email=email, password=password)
 
@@ -41,6 +36,7 @@ class LoginSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("Must include 'email' and 'password'.")
         return user
+    
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """
@@ -48,10 +44,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
     """
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     groups = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=True)
-
-
     class Meta:
-        model = Citizen
+        model = Press
         fields = '__all__' # Add more fields as needed
 
     def create(self, validated_data):
@@ -60,21 +54,18 @@ class RegistrationSerializer(serializers.ModelSerializer):
         """
         groups_data = validated_data.pop('groups', [])
         permissions_data = validated_data.pop('user_permissions', [])
-        citizen = Citizen.objects.create_citizen(
-            **validated_data
-        )
+        press = Press.objects.create_press(
+            **validated_data)
         """
-        email=validated_data['email'],
+            email=validated_data['email'],
             password=validated_data['password'],
-            date_of_birth=validated_data.get('date_of_birth'),
-            first_name=validated_data.get('first_name'),
-            last_name=validated_data.get('last_name'),
+            #groups=validated_data['groups'],
             phone_number=validated_data.get('phone_number'),
             created_at=validated_data.get('created_at'),
             updated_at=validated_data.get('updated_at'),
-            nin_number=validated_data.get('nin_number'),
-            citizen_id=validated_data.get('citizen_id')
-        """
-        citizen.groups.set(groups_data)
-        citizen.user_permissions.set(permissions_data)
-        return citizen
+            press_id=validated_data.get('press_id'),
+            user_permissions=validated_data.get('user_permission'),
+            """
+        press.groups.set(groups_data)
+        press.user_permissions.set(permissions_data)
+        return press
