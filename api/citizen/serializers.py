@@ -1,24 +1,15 @@
 from rest_framework import serializers
-from citizen.models import Citizen, Address, Comment
-from django.contrib.auth import authenticate
-from rest_framework import serializers
-from django.contrib.auth.models import Group
-from press.models import Press
+from citizen.models import Citizen
+from citizen.authentication import JWTAuthentication
+from django.contrib.auth import get_user_model
+#from press.models import Press
+
+User = get_user_model()
 
 class CitizenSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Citizen
-		fields = ['first_name', 'last_name', 'email', 'phone_number']
-
-class AddressSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = Address
-		fields = '__all__'
-
-class CommentSerializer(serializers.ModelSerializer):
-     class Meta:
-          model = Comment
-          fields = '__all__'
+		fields = ['first_name', 'last_name', 'email', 'phone_number', 'created_at', 'updated_at', 'address', "is_press"]
 
 
 class LoginSerializer(serializers.Serializer):
@@ -30,9 +21,11 @@ class LoginSerializer(serializers.Serializer):
         password = data.get('password')
         
         if email and password:
-            user = authenticate(email=email, password=password)
-
-            if user:
+            user = User.objects.filter(email=email).first()
+            if not user:
+                raise serializers.ValidationError("Incorrect email")
+            status = user.check_password(password)
+            if status:
                 if not user.is_active:
                     raise serializers.ValidationError("User account is disabled.")
                 return user
@@ -47,20 +40,20 @@ class RegistrationSerializer(serializers.ModelSerializer):
     Serializer for user registration.
     """
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
-    groups = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=True)
+    #groups = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=True)
 
 
     class Meta:
         model = Citizen
-        fields = '__all__' # Add more fields as needed
+        fields = ["first_name", "last_name", "email", "phone_number", "password","address", "is_press", "is_active", "date_of_birth", "nin_number"] # Add more fields as needed
 
     def create(self, validated_data):
         """
         Create and return a new user instance with the validated data.
         """
-        groups_data = validated_data.pop('groups', [])
-        permissions_data = validated_data.pop('user_permissions', [])
-        citizen = Citizen.objects.create_citizen(
+        #groups_data = validated_data.pop('groups', [])
+        #permissions_data = validated_data.pop('user_permissions', [])
+        citizen = Citizen.objects.create_user(
             **validated_data
         )
         """
@@ -75,6 +68,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
             nin_number=validated_data.get('nin_number'),
             citizen_id=validated_data.get('citizen_id')
         """
-        citizen.groups.set(groups_data)
-        citizen.user_permissions.set(permissions_data)
+        #citizen.groups.set(groups_data)
+        #citizen.user_permissions.set(permissions_data)
         return citizen
