@@ -45,7 +45,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Citizen
-        fields = ["first_name", "last_name", "email", "phone_number", "password","address", "is_press", "is_active", "date_of_birth", "nin_number"] # Add more fields as needed
+        fields = "__all__" # Add more fields as needed
 
     def create(self, validated_data):
         """
