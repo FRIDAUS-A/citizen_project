@@ -126,7 +126,7 @@ DATABASES = {
 DATABASES = {
     'default': dj_database_url.config(
         # Replace this value with your local database's connection string.
-        default=os.environ.get("postgresql://root:W3kIvD0zCxyfvl7IC0d9855miKSmPFLG@dpg-creqndaj1k6c73dfh820-a.oregon-postgres.render.com/citizen_db"),
+        default="postgresql://root:W3kIvD0zCxyfvl7IC0d9855miKSmPFLG@dpg-creqndaj1k6c73dfh820-a.oregon-postgres.render.com/citizen_db"#s.environ.get("DATABASE_URL"),
         conn_max_age=600
     )
 }
