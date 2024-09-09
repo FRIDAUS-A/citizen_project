@@ -4,9 +4,7 @@ blinker==1.4
 Brotli==1.1.0
 certifi==2024.7.4
 charset-normalizer==3.3.2
-chromedriver==2.24.1
 click==8.1.7
-command-not-found==0.3
 coreapi==2.3.3
 coreschema==0.0.4
 cryptography==3.4.8
